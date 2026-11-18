@@ -1,0 +1,176 @@
+{
+  "name": "vscode-ai-explain-code-comments",
+  "displayName": "AI Explain Code Comments (Sidecar)",
+  "description": "Speed up code review with AI-generated line and block explanation comments stored outside source files (.ai-review/)",
+  "version": "0.1.0",
+  "publisher": "local-dev",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "ai",
+    "code review",
+    "comments",
+    "explanation",
+    "sidecar",
+    "annotations"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiExplainComments.toggleDisplayMode",
+        "title": "AI Explain: Switch Display Mode (All / Inline // + CodeLens / Native Threads / Off)",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "aiExplainComments.expandAllThreads",
+        "title": "AI Explain: Expand All Comment Threads in Current File",
+        "icon": "$(expand-all)"
+      },
+      {
+        "command": "aiExplainComments.collapseAllThreads",
+        "title": "AI Explain: Collapse All Comment Threads in Current File",
+        "icon": "$(collapse-all)"
+      },
+      {
+        "command": "aiExplainComments.addComment",
+        "title": "AI Explain: Add Explanation Comment for Selection (Line or Block)",
+        "icon": "$(add)"
+      },
+      {
+        "command": "aiExplainComments.openSidecarFile",
+        "title": "AI Explain: Open Sidecar Comments JSON for Current File",
+        "icon": "$(json)"
+      },
+      {
+        "command": "aiExplainComments.copyAgentPrompt",
+        "title": "AI Explain: Copy AI Agent Prompt to Explain Current File",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "aiExplainComments.refresh",
+        "title": "AI Explain: Reload Sidecar Comments",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "aiExplainComments.showCommentDetail",
+        "title": "AI Explain: Show Explanation Detail"
+      },
+      {
+        "command": "aiExplainComments.createThreadComment",
+        "title": "Save Explanation",
+        "icon": "$(check)"
+      },
+      {
+        "command": "aiExplainComments.deleteThreadComment",
+        "title": "Delete Explanation",
+        "icon": "$(trash)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "aiExplainComments.addComment",
+          "group": "9_aiExplain@1"
+        },
+        {
+          "command": "aiExplainComments.openSidecarFile",
+          "group": "9_aiExplain@2"
+        },
+        {
+          "command": "aiExplainComments.copyAgentPrompt",
+          "group": "9_aiExplain@3"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "aiExplainComments.toggleDisplayMode",
+          "group": "navigation@100"
+        },
+        {
+          "command": "aiExplainComments.openSidecarFile",
+          "group": "navigation@101"
+        }
+      ],
+      "comments/commentThread/context": [
+        {
+          "command": "aiExplainComments.createThreadComment",
+          "when": "commentController == ai-explain-comments && !commentThreadIsEmpty",
+          "group": "inline"
+        },
+        {
+          "command": "aiExplainComments.createThreadComment",
+          "when": "commentController == ai-explain-comments && commentThreadIsEmpty",
+          "group": "inline"
+        }
+      ],
+      "comments/comment/title": [
+        {
+          "command": "aiExplainComments.deleteThreadComment",
+          "when": "commentController == ai-explain-comments",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "AI Explain Code Comments",
+      "properties": {
+        "aiExplainComments.storageFolder": {
+          "type": "string",
+          "default": ".ai-review",
+          "description": "Workspace-relative folder where sidecar .comments.json files are stored."
+        },
+        "aiExplainComments.displayMode": {
+          "type": "string",
+          "enum": [
+            "all",
+            "inlineOnly",
+            "threadsOnly",
+            "off"
+          ],
+          "enumDescriptions": [
+            "Show end-of-line // comments, block highlights, block CodeLens headers, hover popups, and collapsed native comment threads.",
+            "Show end-of-line // comments, block highlights, block CodeLens headers, and hover popups (without native comment threads).",
+            "Show native VS Code comment threads and block highlights only.",
+            "Temporarily hide all AI explanation decorations, CodeLens, hovers, and comment threads."
+          ],
+          "default": "all",
+          "description": "How line and block explanations are rendered in the editor."
+        },
+        "aiExplainComments.inlineMaxLength": {
+          "type": "number",
+          "default": 100,
+          "minimum": 20,
+          "maximum": 300,
+          "description": "Maximum characters shown in end-of-line '//' ghost comments before truncating (full text is always shown on hover)."
+        },
+        "aiExplainComments.expandThreadsByDefault": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether native inline comment threads start expanded when opening a file."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "node -e \"globalThis.File = require('node:buffer').File; require('./node_modules/@vscode/vsce/vsce')\" vsce package --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.24.0",
+    "typescript": "^5.4.5"
+  }
+}
